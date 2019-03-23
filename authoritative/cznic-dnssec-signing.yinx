@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module name="cznic-dnssec-signing"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:dnss="http://www.nic.cz/ns/yang/dns-server"
+        xmlns:dnssec="http://www.nic.cz/ns/yang/dnssec-signing"
+        xmlns:dnspar="http://www.nic.cz/ns/yang/dns-parameters"
+	xmlns:h="http://www.w3.org/1999/xhtml">
+  <namespace uri="http://www.nic.cz/ns/yang/dnssec-signing"/>
+  <prefix value="dnssec"/>
+  <yang-version value="1.1"/>
+  <import module="ietf-yang-types">
+    <prefix value="yang"/>
+  </import>
+  <import module="ietf-inet-types">
+    <prefix value="inet"/>
+  </import>
+  <import module="cznic-dns-server">
+    <prefix value="dnss"/>
+  </import>
+  <import module="cznic-dns-parameters">
+    <prefix value="dnspar"/>
+  </import>
+  <organization>
+    <text>CZ.NIC, z. s. p. o.</text>
+  </organization>
+  <contact>
+    <text>
+      <h:p>
+        Editor:   Ladislav Lhotka<h:br/>
+                  &lt;mailto:lhotka@nic.cz&gt;
+      </h:p>
+    </text>
+  </contact>
+  <description>
+    <text>
+      This YANG module defines configuration data and RPC operations
+      for automatic DNSSEC signatures.
+    </text>
+  </description>
+
+  <revision date="2019-03-20">
+    <description>
+      <text>Initial revision.</text>
+    </description>
+  </revision>
+
+  <!-- Features -->
+  
+  <!-- Identities -->
+
+  <!-- Typedefs -->
+
+  <typedef name="time-interval">
+    <description>
+      <text>This type is used for time intervals such as TTL of
+      resource records or lifetime values of keys and
+      signatures.</text>
+    </description>
+    <type name="uint32">
+      <range value="1..max"/>
+    </type>
+    <units name="seconds"/>
+  </typedef>
+
+  <typedef name="key-size">
+    <type name="uint16"/>
+    <units name="bits"/>
+    <description>
+      <text>Size of a cryptographic key.</text>
+    </description>
+  </typedef>
+
+  <typedef name="key-id">
+    <description>
+      <text>
+	This type is used for identifiers of DNSSEC keys.
+      </text>
+    </description>
+    <type name="string">
+      <length value="40"/>
+    </type>
+  </typedef>
+  
+  <!-- Groupings -->
+
+  <grouping name="zone-options">
+    <description>
+      <text>
+	Zone options that configure DNSSEC signing.
+      </text>
+    </description>
+    <container name="dnssec-signing">
+      <description>
+	<text>Configuration of automatic DNSSEC signing.</text>
+      </description>
+      <presence value="automatic DNSSEC signing"/>
+      <leaf name="enabled">
+	<type name="boolean"/>
+	<default value="true"/>
+	<description>
+	  <text>
+	    This flag allows to disable automatic DNSSEC signing while
+	    keeping its configuration in place.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="policy">
+	<type name="leafref">
+	  <path value="/dnss:dns-server/dnssec:sign-policy/dnssec:name"/>
+	</type>
+	<description>
+	  <text>
+	    <h:p>Reference to a signing policy.</h:p>
+	    <h:p>If this leaf is present, ZSKs are generated
+	    automatically according to the signing policy.</h:p>
+	  </text>
+	</description>
+      </leaf>
+    </container>
+  </grouping>
+
+  <grouping name="key-parameters">
+    <description>
+      <text>
+	Common parameters of DNSSEC keys.
+      </text>
+    </description>
+    <leaf name="algorithm">
+      <type name="dnspar:dnssec-algorithm"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Encryption algorithm for which the key works.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="size">
+      <type name="key-size"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Size of the key.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="publish">
+      <type name="yang:date-and-time"/>
+      <description>
+	<text>
+	  <h:p>The time of key publication (the key appears as a
+	  DNSKEY resource record in the zone).</h:p>
+	  <h:p>Absence of this leaf means the key is published
+	  immediately after the key is created.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <leaf name="activate">
+      <type name="yang:date-and-time"/>
+      <description>
+	<text>
+	  <h:p>Start of the time interval in which the key is used for
+	  signing.</h:p>
+	  <h:p>Absence of this leaf means the key is used for signing
+	  since the time of publishing.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <leaf name="retire">
+      <type name="yang:date-and-time"/>
+      <description>
+	<text>
+	  <h:p>End of the time interval in which the key is used for signing.</h:p>
+	  <h:p>Absence of this leaf means the key is never retired.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <leaf name="remove">
+      <type name="yang:date-and-time"/>
+      <description>
+	<text>
+	  <h:p>The time of DNSKEY RR removal.</h:p>
+	  <h:p>Absence of this leaf means the key is never
+	  removed.</h:p>
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <!-- State data -->
+
+  <augment target-node="/dnss:dns-server-state/dnss:zone">
+    <description>
+      <text>State data for zone DNSSEC signing.</text>
+    </description>
+    <container name="dnssec-signing">
+      <description>
+	<text>
+	  State data related to automatic DNSSEC signing.
+	</text>
+      </description>
+      <leaf name="enabled">
+	<type name="boolean"/>
+	<description>
+	  <text>
+	    Is DNSSEC signing is enabled for the ancestor zone?
+	  </text>
+	</description>
+      </leaf>
+      <list name="key">
+	<key value="key-id"/>
+	<description>
+	  <text>
+	    Parameters of a DNSSEC key.
+	  </text>
+	</description>
+	<leaf name="key-id">
+	  <type name="key-id"/>
+	  <description>
+	    <text>
+	      Key identifier.
+	    </text>
+	  </description>
+	</leaf>
+	<leaf name="key-tag">
+	  <type name="uint16"/>
+	  <mandatory value="true"/>
+	  <description>
+	    <text>
+	      Key tag.
+	    </text>
+	  </description>
+	  <reference>
+	    <text>
+	      RFC 4034: Resource Records for the DNS Security
+	      Extensions.
+	    </text>
+	  </reference>
+	</leaf>
+	<uses name="key-parameters"/>
+	<leaf name="created">
+	  <type name="yang:date-and-time"/>
+	  <description>
+	    <text>
+	      Date and time when the key was created.
+	    </text>
+	  </description>
+	</leaf>
+	<leaf name="flags">
+	  <type name="bits">
+	    <bit name="zone-key">
+	      <position value="7"/>
+	      <description>
+		<text>
+		  This flag indicates a DNS zone key.
+		</text>
+	      </description>
+	    </bit>
+	    <bit name="secure-entry-point">
+	      <position value="15"/>
+	      <description>
+		<text>
+		  This flag indicates a key intended for use as a
+		  secure entry point, i.e., key-signing key.
+		</text>
+	      </description>
+	    </bit>
+	  </type>
+	  <description>
+	    <text>Key flags.</text>
+	  </description>
+	  <reference>
+	    <text>
+	      RFC 4034: Resource Records for the DNS Security
+	      Extensions.
+	    </text>
+	  </reference>
+	</leaf>
+      </list>
+    </container>
+  </augment>
+
+  <!-- Configuration data -->
+
+  <augment target-node="/dnss:dns-server">
+    <description>
+      <text>
+	Augment DNS server configuration with a list of DNSSEC signing
+	policies.
+      </text>
+    </description>
+    <list name="sign-policy">
+      <key value="name"/>
+      <description>
+	<text>
+	  A named DNSSEC signing policy.
+	</text>
+      </description>
+      <uses name="dnss:entry-name"/>
+      <leaf name="algorithm">
+	<type name="dnspar:dnssec-algorithm"/>
+	<default value="RSASHA256"/>
+	<description>
+	  <text>
+	    Algorithm used for signing keys and issued signatures.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="ksk-size">
+	<type name="key-size"/>
+	<default value="2048"/>
+	<description>
+	  <text>
+	    The size of generated key-signing keys.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="zsk-size">
+	<type name="key-size"/>
+	<default value="1024"/>
+	<description>
+	  <text>
+	    The size of generated zone-signing keys.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="dnskey-ttl">
+	<type name="dnss:rr-ttl"/>
+	<description>
+	  <text>
+	    TTL value for DNSKEY records added to zone apex.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="zsk-lifetime">
+	<type name="time-interval"/>
+	<default value="2592000"/>
+	<description>
+	  <text>
+	    <h:p>Time interval after which ZSK rollover will be initiated.</h:p>
+	    <h:p>The default value corresponds to 30 days.</h:p>
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="rrsig-lifetime">
+	<type name="time-interval"/>
+	<default value="1209600"/>
+	<description>
+	  <text>
+	    <h:p>Lifetime of newly issued signatures.</h:p>
+	    <h:p>The default value corresponds to two weeks.</h:p>
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="rrsig-refresh">
+	<type name="uint32"/>
+	<units name="seconds"/>
+	<default value="604800"/>
+	<description>
+	  <text>
+	    <h:p>This parameter specifies how long before signature
+	    expiration the signature will be refreshed.</h:p>
+	    <h:p>The default value corresponds to one week.</h:p>
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="nsec3">
+	<type name="boolean"/>
+	<default value="false"/>
+	<description>
+	  <text>
+	    This flag specifies whether NSEC3 will be used instead of
+	    NSEC.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="soa-min-ttl">
+	<type name="dnss:rr-ttl"/>
+	<description>
+	  <text>
+	    SOA minimum TTL value.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="zone-max-ttl">
+	<type name="dnss:rr-ttl"/>
+	<description>
+	  <text>
+	    Maximum TTL value present in the zone.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="propagation-delay">
+	<type name="uint32"/>
+	<units name="seconds"/>
+	<default value="3600"/>
+	<description>
+	  <text>
+	    Extra delay added to every key rollover step.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="manual">
+	<type name="boolean"/>
+	<default value="false"/>
+	<description>
+	  <text>
+	    Setting this flag to true enables manual key
+	    management. In this case, no keys will be generated or
+	    rolled out automatically.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="keystore">
+	<type name="leafref">
+	  <path value="../../keystore/name"/>
+	</type>
+	<description>
+	  <text>
+	    Name of a keystore to be used by the policy.
+	  </text>
+	</description>
+      </leaf>
+    </list>
+    <list name="keystore">
+      <key value="name"/>
+      <description>
+	<text>
+	  The list of configured stores for private key material.
+	</text>
+      </description>
+      <uses name="dnss:entry-name"/>
+      <leaf name="backend">
+	<description>
+	  <text>
+	    Type of the keystore backend.
+	  </text>
+	</description>
+	<type name="enumeration">
+	  <enum name="pkcs8">
+	    <description>
+	      <text>
+		This backend type stores private key material in
+		unencrypted X.509 PEM files.
+	      </text>
+	    </description>
+	  </enum>
+	  <enum name="pkcs11">
+	    <description>
+	      <text>
+		This backend type stores private key material in a
+		cryptographic token accessible via the PKCS#11
+		interface.
+	      </text>
+	    </description>
+	  </enum>
+	</type>
+	<default value="pkcs8"/>
+      </leaf>
+      <choice name="keystore-config">
+	<description>
+	  <text>
+	    Additional configuration parameters for individual backends.
+	  </text>
+	</description>
+	<case name="pkcs8">
+	  <when condition="../backend = 'pkcs8'"/>
+	  <leaf name="keystore-directory">
+	    <type name="dnss:fs-path"/>
+	    <description>
+	      <text>
+		<h:p>Absolute path to a filesystem directory where
+		private key material is stored.</h:p>
+	      </text>
+	    </description>
+	  </leaf>
+	</case>
+	<case name="pkcs11">
+	  <when condition="../backend = 'pkcs11'"/>
+	  <leaf name="token-url">
+	    <type name="inet:uri"/>
+	    <description>
+	      <text>
+		<h:p>URI of the PKCS#11 token.</h:p>
+		<h:p>If the token is protected by a PIN, the URI must
+		include 'pin-value' or 'pin-source' attribute.</h:p>
+	      </text>
+	    </description>
+	    <reference>
+	      <text>
+		RFC 7512: The PKCS #11 URI Scheme
+	      </text>
+	    </reference>
+	  </leaf>
+	  <leaf name="module-path">
+	    <type name="dnss:fs-path"/>
+	    <description>
+	      <text>
+		PKCS #11 module path.
+	      </text>
+	    </description>
+	  </leaf>
+	</case>
+      </choice>
+    </list>
+  </augment>
+  
+  <augment target-node="/dnss:dns-server/dnss:zones/dnss:template">
+    <description>
+      <text>
+	DNSSEC signing configuration for a zone template.
+      </text>
+    </description>
+    <uses name="dnssec:zone-options"/>
+  </augment>
+
+  <augment target-node="/dnss:dns-server/dnss:zones/dnss:zone">
+    <description>
+      <text>
+	DNSSEC signing configuration for a zone.
+      </text>
+    </description>
+    <uses name="dnssec:zone-options"/>
+  </augment>
+
+  <!-- RPC operations -->
+
+  <rpc name="generate-key">
+    <description>
+      <text>Generate a DNSSEC signing key.</text>
+    </description>
+    <input>
+      <uses name="key-parameters"/>
+      <leaf name="secure-entry-point">
+	<type name="boolean"/>
+	<default value="false"/>
+	<description>
+	  <text>
+	    This flag indicates that the key is the secure entry point
+	    of the corresponding zone, i.e., a key-signing key.
+	  </text>
+	</description>
+      </leaf>
+    </input>
+    <output>
+      <leaf name="key-id">
+	<type name="key-id"/>
+	<mandatory value="true"/>
+	<description>
+	  <text>
+	    Identifier of the generated key.
+	  </text>
+	</description>
+      </leaf>
+      <leaf name="key-tag">
+	<type name="uint16"/>
+	<mandatory value="true"/>
+	<description>
+	  <text>
+	    Tag of the generated key.
+	  </text>
+	</description>
+      </leaf>
+    </output>
+  </rpc>
+  
+  <rpc name="zone-sign">
+    <description>
+      <text>
+	Sign specified zones with available DNSSEC keys.
+      </text>
+    </description>
+    <input>
+      <leaf-list name="zones">
+	<type name="dnss:zone-ref"/>
+	<description>
+	  <text>
+	    Domain names of the zones to be signed.
+	  </text>
+	</description>
+      </leaf-list>
+    </input>
+  </rpc>
+
+</module>

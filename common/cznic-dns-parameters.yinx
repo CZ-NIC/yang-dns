@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module name="cznic-dns-parameters"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:ianadns="http://www.nic.cz/ns/yang/dns-parameters"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+  <namespace uri="http://www.nic.cz/ns/yang/dns-parameters"/>
+  <prefix value="dnspar"/>
+  <yang-version value="1.1"/>
+  <import module="ietf-yang-types">
+    <prefix value="yang"/>
+  </import>
+  <organization>
+    <text>CZ.NIC, z. s. p. o.</text>
+  </organization>
+  <contact>
+    <text>
+      <h:p>
+        Editor:   Ladislav Lhotka<h:br/>
+                  &lt;mailto:lhotka@nic.cz&gt;
+      </h:p>
+    </text>
+  </contact>
+  <description>
+    <text>
+      <h:p>This module provides several data types that are maintained
+      in IANA registries related to DNS resource records.</h:p>
+    </text>
+  </description>
+  <reference>
+    <text>
+      <h:ul>
+	<h:li>IANA: Domain Name System Security (DNSSEC) Algorithm
+	Numbers.<h:br/>
+	http://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml</h:li>
+	<h:li>IANA: Delegation Signer (DS) Resource Record (RR) Type
+	Digest Algorithms.<h:br/>
+	http://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml#ds-rr-types-1</h:li>
+	<h:li>IANA: Domain Name System Security (DNSSEC) NextSECure3
+	(NSEC3) Parameters.<h:br/>
+	https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml</h:li>
+	<h:li>IANA: DNSKEY Flags.<h:br/>
+	https://www.iana.org/assignments/dnskey-flags/dnskey-flags.xhtml</h:li>
+	<h:li>IANA: DNS-Based Authentication of Named Entities (DANE)
+	Parameters.<h:br/>
+	http://www.iana.org/assignments/dane-parameters/dane-parameters.xhtml</h:li>
+	<h:li>IANA: IPSECKEY Resource Record Parameters.<h:br/>
+	https://www.iana.org/assignments/ipseckey-rr-parameters/ipseckey-rr-parameters.xhtml</h:li>
+	<h:li>IANA: DNS SSHFP Resource Record Parameters.<h:br/>
+	https://www.iana.org/assignments/dns-sshfp-rr-parameters/dns-sshfp-rr-parameters.xhtml</h:li>
+      </h:ul>
+    </text>
+  </reference>
+  <revision date="2019-03-20">
+    <description>
+      <text>Initial revision.</text>
+    </description>
+  </revision>
+
+  <!-- Typedefs -->
+
+  <typedef name="domain-name">
+    <description>
+      <text>
+	<h:p>This typedef replaces the 'domain-name' type as defined in the
+	module 'ietf-inet-types'. The two additions are:</h:p>
+	<h:ol>
+	  <h:li>classless in-addr.arpa delegation [RFC 2317]</h:li>
+	  <h:li>wildcards [RFC 4592]</h:li>
+	</h:ol>
+      </text>
+    </description>
+    <type name="string">
+      <pattern
+	  value="((\*\.)?(([a-zA-Z0-9_]([a-zA-Z0-9\-/_]){0,61})?[a-zA-Z0-9]\.)*([a-zA-Z0-9_]([a-zA-Z0-9\-_]){0,61})?[a-zA-Z0-9]\.?)|\."><?delim )?></pattern>
+      <length value="1..253"/>
+    </type>
+  </typedef>
+
+  <typedef name="ascii-string">
+    <description>
+      <text>
+	A string consisting of ASCII characters (U+0000 to U+007F).
+      </text>
+    </description>
+    <type name="string">
+      <pattern value="\p{IsBasicLatin}*"/>
+    </type>
+  </typedef>
+
+  <typedef name="base32hex">
+    <description>
+      <text>
+	<h:p>This typedef represents binary data in Base 32 encoding with
+	extended hex alphabet.</h:p>
+	<h:p>This type differs from base32hex spec in that letters can
+	be upper- or lower-case.</h:p>
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4648: The Base16, Base32, and Base64 Data Encodings
+      </text>
+    </reference>
+    <type name="string">
+      <pattern
+	  value="([0-9A-Va-v]{8})*([0-9A-Va-v]{2}={6}||[0-9A-Va-v]{4}={4}|[0-9A-Va-v]{5}===|[0-9A-Va-v]{7}=)?"/>
+    </type>
+  </typedef>
+
+  <typedef name="hex-digits">
+    <description>
+      <text>
+	A string of case-insensitive hexadecimal digits, possibly
+	empty.
+      </text>
+    </description>
+    <type name="string">
+      <pattern value="[0-9A-Fa-f]*"/>
+    </type>
+  </typedef>
+
+  <typedef name="time-interval">
+    <type name="uint32">
+      <range value="1..max"/>
+    </type>
+    <units name="seconds"/>
+    <description>
+      <text>
+	32-bit time interval.
+      </text>
+    </description>
+  </typedef>
+
+  <typedef name="utc-date-time">
+    <description>
+      <text>
+	UTC date and time.
+      </text>
+    </description>
+    <type name="yang:date-and-time">
+      <pattern value=".*Z"/>
+    </type>
+  </typedef>
+  
+  <typedef name="dnssec-algorithm">
+    <description>
+      <text>
+	<h:p>This enumeration type defines algorithms for DNSSEC
+	signing as defined by IANA.</h:p>
+	<h:p>The numbers defined by the 'value' statements are used in
+	KEY, SIG, DNSKEY, RRSIG and CERT resource records for
+	identifying the security algorithm.</h:p>
+	<h:p>Value 0, 4, 9 and 11 are reserved.</h:p>
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security Extensions
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="RSAMD5">
+	<description>
+	 <text>RSA/MD5</text>
+	</description>
+	<status value="deprecated"/>
+	<value value="1"/>
+      </enum>
+      <enum name="DH">
+	<description>
+	  <text>Diffie-Hellman</text>
+	</description>
+	<value value="2"/>
+      </enum>
+      <enum name="DSA">
+	<description>
+	  <text>DSA/SHA1</text>
+	</description>
+	<value value="3"/>
+      </enum>
+      <enum name="RSASHA1">
+	<description>
+	  <text>RSA/SHA1</text>
+	</description>
+	<value value="5"/>
+      </enum>
+      <enum name="DSA-NSEC3-SHA1">
+	<description>
+	  <text>DSA-NSEC3-SHA1</text>
+	</description>
+	<value value="6"/>
+      </enum>
+      <enum name="RSASHA1-NSEC3-SHA1">
+	<description>
+	  <text>RSASHA1-NSEC3-SHA1</text>
+	</description>
+	<value value="7"/>
+      </enum>
+      <enum name="RSASHA256">
+	<description>
+	  <text>RSA/SHA256</text>
+	</description>
+	<value value="8"/>
+      </enum>
+      <enum name="RSASHA512">
+	<description>
+	  <text>RSA/SHA512</text>
+	</description>
+	<value value="10"/>
+      </enum>
+      <enum name="ECC-GOST">
+	<description>
+	  <text>GOST R 34.10-2001</text>
+	</description>
+	<value value="12"/>
+      </enum>
+      <enum name="ECDSAP256SHA256">
+	<description>
+	  <text>ECDSA Curve P-256 with SHA-256</text>
+	</description>
+	<value value="13"/>
+      </enum>
+      <enum name="ECDSAP384SHA384">
+	<description>
+	  <text>ECDSA Curve P-384 with SHA-384</text>
+	</description>
+	<value value="14"/>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="digest-algorithm">
+    <description>
+      <text>
+	This enumeration type defines types of digest algorithms for
+	Delegation Signer (DS) RR type.
+      </text>
+    </description>
+    <type name="enumeration">
+      <enum name="SHA-1">
+	<value value="1"/>
+	<description>
+	  <text>
+	    SHA-1 digest algorithm. Mandatory to support.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 4034: Resource Records for the DNS Security Extensions
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SHA-256">
+	<value value="2"/>
+	<description>
+	  <text>
+	    SHA-256 digest algorithm. Mandatory to support.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 4509: Use of SHA-256 in DNSSEC Delegation Signer (DS)
+	    Resource Records (RRs)
+	  </text>
+	</reference>
+      </enum>
+      <enum name="GOST-R-34.11-94">
+	<value value="3"/>
+	<description>
+	  <text>
+	    GOST R 34.11-94 digest algorithm. Optional to implement.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 5933: Use of GOST Signature Algorithms in DNSKEY and
+	    RRSIG Resource Records for DNSSEC
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SHA-384">
+	<value value="4"/>
+	<description>
+	  <text>
+	    SHA-384 digest algorithm. Optional to support.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 6605: Elliptic Curve Digital Signature Algorithm (DSA)
+	    for DNSSEC
+	  </text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="dnskey-flags">
+    <description>
+      <text>
+	This enumeration type defines flags for DNSKEY RR.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security Extensions
+      </text>
+    </reference>
+    <type name="bits">
+      <bit name="ZONE">
+	<position value="7"/>
+	<description>
+	  <text>
+	    <h:p>Zone Key flag.</h:p>
+	    <h:p>If this bit has value 1, then the DNSKEY record holds
+	    a DNS zone key. If bit 7 has value 0, then the DNSKEY
+	    record holds some other type of DNS public key and MUST
+	    NOT be used to verify RRSIGs that cover RRsets.</h:p>
+	  </text>
+	</description>
+      </bit>
+      <bit name="REVOKE">
+	<position value="8"/>
+	<description>
+	  <text>
+	    <h:p>Revoke flag.</h:p>
+	    <h:p>If this bit has value 1, and the resolver sees an
+	    RRSIG(DNSKEY) signed by the associated key, then the
+	    resolver MUST consider this key permanently invalid for
+	    all purposes except for validating the revocation.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 5011: Automated Updates of DNS Security (DNSSEC) Trust
+	    Anchors
+	  </text>
+	</reference>
+      </bit>
+      <bit name="SEP">
+	<position value="15"/>
+	<description>
+	  <text>
+	    <h:p>Secure Entry Point flag.</h:p>
+	    <h:p>If this bit has value 1, then the DNSKEY record holds
+	    a key intended for use as a secure entry point.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 3757: Domain Name System KEY (DNSKEY) Resource Record
+	    (RR) Secure Entry Point (SEP) Flag
+	  </text>
+	</reference>
+      </bit>
+    </type>
+  </typedef>
+
+  <typedef name="dnssec-nsec3-flags">
+    <description>
+      <text>
+	This enumeration type defines flags for NSEC3 RR.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 5155: DNS Security (DNSSEC) Hashed Authenticated Denial of
+	Existence
+      </text>
+    </reference>
+    <type name="bits">
+      <bit name="Opt-Out">
+	<position value="7"/>
+	<description>
+	  <text>
+	    The Opt-Out Flag indicates whether this NSEC3 resource
+	    record may cover unsigned delegations.
+	  </text>
+	</description>
+      </bit>
+    </type>
+  </typedef>
+
+  <typedef name="dnssec-nsec3-hash-algorithm">
+    <description>
+      <text>
+	This enumeration type defines cryptographic hash algorithms
+	used to construct the hash value in NSEC3 RR.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 5155: DNS Security (DNSSEC) Hashed Authenticated Denial of
+	Existence
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="SHA-1">
+	<value value="1"/>
+	<description>
+	  <text>
+	    SHA-1 hash algorithm.
+	  </text>
+	</description>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="tlsa-certificate-usages">
+    <description>
+      <text>
+	This enumeration type defines the provided association that
+	will be used to match the certificate presented in the TLS
+	handshake.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 6698: The DNS-Based Authentication of Named Entities
+	(DANE) Transport Layer Security (TLS) Protocol: TLSA
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="PKIX-TA">
+	<value value="0"/>
+	<description>
+	  <text>
+	    CA constraint.
+	  </text>
+	</description>
+      </enum>
+      <enum name="PKIX-EE">
+	<value value="1"/>
+	<description>
+	  <text>
+	    Service certificate constraint.
+	  </text>
+	</description>
+      </enum>
+      <enum name="DANE-TA">
+	<value value="2"/>
+	<description>
+	  <text>
+	    Trust anchor assertion.
+	  </text>
+	</description>
+      </enum>
+      <enum name="DANE-EE">
+	<value value="3"/>
+	<description>
+	  <text>
+	    Domain-issued certificate.
+	  </text>
+	</description>
+      </enum>
+      <enum name="PrivCert">
+	<value value="255"/>
+	<description>
+	  <text>
+	    Reserved for Private Use.
+	  </text>
+	</description>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="tlsa-selectors">
+    <description>
+      <text>
+	This enumeration type specifies which part of the TLS
+	certificate presented by the server will be matched against
+	the association data.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 6698: The DNS-Based Authentication of Named Entities
+	(DANE) Transport Layer Security (TLS) Protocol: TLSA
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="Cert">
+	<value value="0"/>
+	<description>
+	  <text>
+	    Full certificate.
+	  </text>
+	</description>
+      </enum>
+      <enum name="SPKI">
+	<value value="1"/>
+	<description>
+	  <text>
+	    SubjectPublicKeyInfo.
+	  </text>
+	</description>
+      </enum>
+      <enum name="PrivSel">
+	<value value="255"/>
+	<description>
+	  <text>
+	    Reserved for Private Use.
+	  </text>
+	</description>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="tlsa-matching-type">
+    <description>
+      <text>
+	This enumeration type specifies how the certificate
+	association is presented.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 6698: The DNS-Based Authentication of Named Entities
+	(DANE) Transport Layer Security (TLS) Protocol: TLSA
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="Full">
+	<value value="0"/>
+	<description>
+	  <text>
+	    No hash used.
+	  </text>
+	</description>
+      </enum>
+      <enum name="SHA2-256">
+	<value value="1"/>
+	<description>
+	  <text>
+	    256-bit hash by SHA2.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 6234: US Secure Hash Algorithms (SHA and SHA-based
+	    HMAC and HKDF)
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SHA2-512">
+	<value value="2"/>
+	<description>
+	  <text>
+	    512-bit hash by SHA2.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 6234: US Secure Hash Algorithms (SHA and SHA-based
+	    HMAC and HKDF)
+	  </text>
+	</reference>
+      </enum>
+      <enum name="PrivMatch">
+	<value value="255"/>
+	<description>
+	  <text>
+	    Reserved for Private Use.
+	  </text>
+	</description>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="ipseckey-algorithm-type">
+    <description>
+      <text>
+	This enumeration type specifies the IPSec public key's
+	cryptographic algorithm.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4025: A Method for Storing IPsec Keying Material in DNS
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="no-key">
+	<value value="0"/>
+	<description>
+	  <text>
+	    No key is present.
+	  </text>
+	</description>
+      </enum>
+      <enum name="DSA">
+	<value value="1"/>
+	<description>
+	  <text>
+	    A DSA key is present, in the format defined in RFC 2536.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 2536: DSA KEYs and SIGs in the Domain Name System
+	    (DNS)
+	  </text>
+	</reference>
+      </enum>
+      <enum name="RSA">
+	<value value="2"/>
+	<description>
+	  <text>
+	    A RSA key is present, in the format defined in RFC 3110.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 3110: RSA/SHA-1 SIGs and RSA KEYs in the Domain Name
+	    System (DNS)
+	  </text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="ipseckey-gateway-type">
+    <description>
+      <text>
+	This enumeration type specifies the type of the gateway to
+	which an IPsec tunnel may be created.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4025: A Method for Storing IPsec Keying Material in DNS
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="no-gateway">
+	<value value="0"/>
+	<description>
+	  <text>
+	    No gateway is present.
+	  </text>
+	</description>
+      </enum>
+      <enum name="IPv4-address">
+	<value value="1"/>
+	<description>
+	  <text>
+	    A 4-byte IPv4 address is present.
+	  </text>
+	</description>
+      </enum>
+      <enum name="IPv6-address">
+	<value value="2"/>
+	<description>
+	  <text>
+	    A 16-byte IPv6 address is present.
+	  </text>
+	</description>
+      </enum>
+      <enum name="domain-name">
+	<value value="3"/>
+	<description>
+	  <text>
+	    A wire-encoded domain name is present.
+	  </text>
+	</description>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="sshfp-algorithm-type">
+    <description>
+      <text>
+	This enumeration specifies the algorithm of the public key.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4255: Using DNS to Securely Publish Secure Shell (SSH) Key
+	Fingerprints
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="RSA">
+	<value value="1"/>
+	<description>
+	  <text>RSA algorithm.</text>
+	</description>
+      </enum>
+      <enum name="DSA">
+	<value value="2"/>
+	<description>
+	  <text>DSA algorithm.</text>
+	</description>
+      </enum>
+      <enum name="ECDSA">
+	<value value="3"/>
+	<description>
+	  <text>ECDSA algorithm.</text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 6594: Use of the SHA-256 Algorithm with RSA, Digital
+	    Signature Algorithm (DSA), and Elliptic Curve DSA (ECDSA)
+	    in SSHFP Resource Records
+	  </text>
+	</reference>
+      </enum>
+      <enum name="Ed25519">
+	<value value="4"/>
+	<description>
+	  <text>Ed25519 algorithm.</text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 7479: Using Ed25519 in SSHFP Resource Records
+	  </text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="sshfp-fingerprint-type">
+    <description>
+      <text>
+	This enumeration specifies the message-digest algorithm used
+	to calculate the fingerprint of the public key.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4255: Using DNS to Securely Publish Secure Shell (SSH) Key
+	Fingerprints
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="SHA-1">
+	<value value="1"/>
+	<description>
+	  <text>
+	    SHA-1 message-digest algorithm.
+	  </text>
+	</description>
+      </enum>
+      <enum name="SHA-256">
+	<value value="2"/>
+	<description>
+	  <text>
+	    SHA-256 message-digest algorithm.
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    RFC 6594: Use of the SHA-256 Algorithm with RSA, Digital
+	    Signature Algorithm (DSA), and Elliptic Curve DSA (ECDSA)
+	    in SSHFP Resource Records
+	  </text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+</module>

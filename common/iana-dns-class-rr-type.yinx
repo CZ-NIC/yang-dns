@@ -1,0 +1,1233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+	xmlns:dnsz="urn:ietf:params:xml:ns:yang:iana-dns-class-rr-type"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	name="iana-dns-class-rr-type">
+  <namespace uri="urn:ietf:params:xml:ns:yang:iana-dns-class-rr-type"/>
+  <prefix value="dnsct"/>
+  <yang-version value="1.1"/>
+  <organization xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+    <text>Internet Assigned Numbers Authority (IANA)</text>
+  </organization>
+  <contact>
+    <text>
+      <h:p>        Internet Assigned Numbers Authority</h:p>
+      <h:p>
+	Postal: ICANN<h:br/>
+	        4676 Admiralty Way, Suite 330<h:br/>
+	        Marina del Rey, CA 90292
+      </h:p>
+      <h:p>
+	Tel:    +1 310 823 9358
+      </h:p>
+      <h:p>
+	&lt;mailto:iana@iana.org&gt;
+      </h:p>
+    </text>
+  </contact>
+  <description>
+    <text>
+      <h:p>This YANG module translates IANA registries 'DNS CLASSes'
+      and 'Resource Record (RR) TYPEs' to YANG derived types.</h:p>
+      <h:p>
+	Copyright (c) 2018 IETF Trust and the persons identified as
+	authors of the code.  All rights reserved.
+      </h:p>
+      <h:p>
+	Redistribution and use in source and binary forms, with or
+	without modification, is permitted pursuant to, and subject to
+	the license terms contained in, the Simplified BSD License set
+	forth in Section 4.c of the IETF Trust's Legal Provisions
+	Relating to IETF Documents
+	(https://trustee.ietf.org/license-info).
+      </h:p>
+      <h:p>
+	This version of this YANG module is part of RFC XXXX
+	(https://tools.ietf.org/html/rfcXXXX); see the RFC itself for
+	full legal notices.
+      </h:p>
+    </text>
+  </description>
+  <reference>
+    <text>
+      <h:p>IANA 'Domain Name System (DNS) Parameters' registry<h:br/>
+      https://www.iana.org/assignments/dns-parameters</h:p>
+    </text>
+  </reference>
+  <revision date="2019-02-27">
+    <description>
+      <text>Initial revision.</text>
+    </description>
+    <reference>
+      <text>RFC XXXX: YANG Types for DNS Classes and Resource Record
+      Types</text>
+    </reference>
+  </revision>
+
+  <!-- Typedefs -->
+  
+  <typedef name="dns-class-name">
+    <description>
+      <text>This enumeration type defines mnemonic names and
+      corresponding numeric values of DNS classes.</text>
+    </description>
+    <reference>
+      <text>RFC 6895: Domain Name System (DNS) IANA Considerations</text>
+    </reference>
+    <type name="enumeration">
+      <enum name="IN">
+	<value value="1"/>
+	<description>
+	  <text>Internet</text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and Specification</text>
+	</reference>
+      </enum>
+      <enum name="CH">
+	<value value="3"/>
+	<description>
+	  <text>Chaos</text>
+	</description>
+	<reference>
+	  <text>Moon, D., 'Chaosnet', A. I. Memo 628, MIT Artificial
+	  Intelligence Laboratory, June 1981</text>
+	</reference>
+      </enum>
+      <enum name="HS">
+	<value value="4"/>
+	<description>
+	  <text>Hesiod</text>
+	</description>
+	<reference>
+	  <text>Dyer, S. and Hsu, F, 'Hesiod', Project Athena
+	  Technical Plan - Name Service, April 1987</text>
+	</reference>
+      </enum>
+      <enum name="NONE">
+	<value value="254"/>
+	<description>
+	  <text>QCLASS NONE</text>
+	</description>
+	<reference>
+	  <text>RFC 2136: Dynamic Updates in the Domain Name System
+	  (DNS UPDATE)</text>
+	</reference>
+      </enum>
+      <enum name="ANY">
+	<value value="255"/>
+	<description>
+	  <text>QCLASS * (ANY)</text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="dns-class">
+    <description>
+      <text>This type allows for referring to a DNS class using either
+      the assigned mnemonic name or numeric value.</text>
+    </description>
+    <type name="union">
+      <type name="uint16"/>
+      <type name="dns-class-name"/>
+    </type>
+  </typedef>
+
+  <typedef name="rr-type-name">
+    <description>
+      <text>This enumeration type defines mnemonic names and
+      corresponding numeric values of DNS resource record
+      types.</text>
+    </description>
+    <reference>
+      <text>
+	<h:ul>
+	  <h:li>RFC 6895: Domain Name System (DNS) IANA
+	  Considerations</h:li>
+	  <h:li>RFC 1035: Domain Names - Implementation and
+	  Specification</h:li>
+	</h:ul>
+      </text>
+    </reference>
+    <type name="enumeration">
+      <enum name="A">
+	<value value="1"/>
+	<description>
+	  <text>
+            <h:p>A host address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="NS">
+	<value value="2"/> 
+	<description>
+	  <text>
+            <h:p>An authoritative name server.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MD">
+	<value value="3"/>
+	<status value="obsolete"/>
+	<description>
+	  <text>
+            <h:p>A mail destination (obsolete – use MX).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MF">
+	<value value="4"/>
+	<status value="obsolete"/>
+	<description>
+	  <text>
+            <h:p>A mail forwarder (obsolete – use MX).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="CNAME">
+	<value value="5"/>
+	<description>
+	  <text>
+            <h:p>The canonical name for an alias.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="SOA">
+	<value value="6"/>
+	<description>
+	  <text>
+            <h:p>Start of a zone of authority.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MB">
+	<value value="7"/>
+	<description>
+	  <text>
+            <h:p>A mailbox domain name (experimental).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MG">
+	<value value="8"/>
+	<description>
+	  <text>
+            <h:p>A mail group member (experimental).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MR">
+	<value value="9"/>
+	<description>
+	  <text>
+            <h:p>A mail rename domain name (experimental).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="NULL">
+	<value value="10"/>
+	<description>
+	  <text>
+            <h:p>A null RR (experimental).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="WKS">
+	<value value="11"/>
+	<description>
+	  <text>
+            <h:p>A well known service description.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="PTR">
+	<value value="12"/>
+	<description>
+	  <text>
+            <h:p>A domain name pointer.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="HINFO">
+	<value value="13"/>
+	<description>
+	  <text>
+            <h:p>Host information.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MINFO">
+	<value value="14"/>
+	<description>
+	  <text>
+            <h:p>Mailbox or mail list information.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MX">
+	<value value="15"/>
+	<description>
+	  <text>
+            <h:p>Mail exchange.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="TXT">
+	<value value="16"/>
+	<description>
+	  <text>
+            <h:p>Text strings.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="RP">
+	<value value="17"/>
+	<description>
+	  <text>
+            <h:p>Responsible person.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1183: New DNS RR Definitions</text>
+	</reference>
+      </enum>
+      <enum name="AFSDB">
+	<value value="18"/>
+	<description>
+	  <text>
+            <h:p>AFS data base location.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 1183: New DNS RR Definitions</h:li>
+	      <h:li>RFC 5864: DNS SRV Resource Records for AFS</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="X25">
+	<value value="19"/>
+	<description>
+	  <text>
+            <h:p>X.25 PSDN address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1183: New DNS RR Definitions</text>
+	</reference>
+      </enum>
+      <enum name="ISDN">
+	<value value="20"/>
+	<description>
+	  <text>
+            <h:p>ISDN address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1183: New DNS RR Definitions</text>
+	</reference>
+      </enum>
+      <enum name="RT">
+	<value value="21"/>
+	<description>
+	  <text>
+            <h:p>Route through.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1183: New DNS RR Definitions</text>
+	</reference>
+      </enum>
+      <enum name="NSAP">
+	<value value="22"/>
+	<description>
+	  <text>
+            <h:p>NSAP address, NSAP style A record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1706: DNS NSAP Resource Records</text>
+	</reference>
+      </enum>
+      <enum name="NSAP-PTR">
+	<value value="23"/>
+	<description>
+	  <text>
+            <h:p>Domain name pointer, NSAP style.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 1348: DNS NSAP RRs</h:li>
+	      <h:li>RFC 1637: DNS NSAP Resource Records</h:li>
+	      <h:li>RFC 1706: DNS NSAP Resource Records</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SIG">
+	<value value="24"/>
+	<description>
+	  <text>
+            <h:p>Security signature.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	      <h:li>RFC 2535: Domain Name System Security
+	      Extensions</h:li>
+	      <h:li>RFC 2536: DSA KEYs and SIGs in the Domain Name
+	      System (DNS)</h:li>
+	      <h:li>RFC 2537: RSA/MD5 KEYs and SIGs in the Domain Name
+	      System (DNS)</h:li>
+	      <h:li>RFC 2931: DNS Request and Transaction Signatures
+	      (SIG(0)s)</h:li>
+	      <h:li>RFC 3110: RSA/SHA-1 SIGs and RSA KEYs in the
+	      Domain Name System (DNS)</h:li>
+	      <h:li>RFC 3008: Domain Name System Security (DNSSEC)
+	      Signing Authority</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="KEY">
+	<value value="25"/>
+	<description>
+	  <text>
+            <h:p>Security key.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	      <h:li>RFC 2535: Domain Name System Security
+	      Extensions</h:li>
+	      <h:li>RFC 2536: DSA KEYs and SIGs in the Domain Name
+	      System (DNS)</h:li>
+	      <h:li>RFC 2537: RSA/MD5 KEYs and SIGs in the Domain Name
+	      System (DNS)</h:li>
+	      <h:li>RFC 2539: Storage of Diffie-Hellman Keys in the
+	      Domain Name System (DNS)</h:li>
+	      <h:li>RFC 3008: Domain Name System Security (DNSSEC)
+	      Signing Authority</h:li>
+	      <h:li>RFC 3110: RSA/SHA-1 SIGs and RSA KEYs in the
+	      Domain Name System (DNS)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="PX">
+	<value value="26"/>
+	<description>
+	  <text>
+            <h:p>X.400 mail mapping information.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 2163: Using the Internet DNS to Distribute MIXER
+	  Conformant Global Address Mapping (MCGAM)</text>
+	</reference>
+      </enum>
+      <enum name="GPOS">
+	<value value="27"/>
+	<description>
+	  <text>
+            <h:p>Geographical position.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1712: DNS Encoding of Geographical Location</text>
+	</reference>
+      </enum>
+      <enum name="AAAA">
+	<value value="28"/>
+	<description>
+	  <text>
+            <h:p>IPv6 address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 3596: DNS Extensions to Support IP Version 6</text>
+	</reference>
+      </enum>
+      <enum name="LOC">
+	<value value="29"/>
+	<description>
+	  <text>
+            <h:p>Location information.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1876: A Means for Expressing Location Information
+	  in the Domain Name System</text>
+	</reference>
+      </enum>
+      <enum name="NXT">
+	<value value="30"/>
+	<status value="obsolete"/>
+	<description>
+	  <text>
+            <h:p>Next domain (obsolete).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	      <h:li>RFC 2535: Domain Name System Security
+	      Extensions</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="EID">
+	<value value="31"/>
+	<description>
+	  <text>
+            <h:p>Endpoint identifier.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="NIMLOC">
+	<value value="32"/>
+	<description>
+	  <text>
+            <h:p>Nimrod locator.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="SRV">
+	<value value="33"/>
+	<description>
+	  <text>
+            <h:p>Server selection.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 2782: A DNS RR for specifying the location of
+	  services (DNS SRV)</text>
+	</reference>
+      </enum>
+      <enum name="ATMA">
+	<value value="34"/>
+	<description>
+	  <text>
+            <h:p>ATM address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>ATM Forum Technical Committee, 'ATM Name System V2.0',
+	  AF-DANS-0152.00, July 2000</text>
+	</reference>
+      </enum>
+      <enum name="NAPTR">
+	<value value="35"/>
+	<description>
+	  <text>
+            <h:p>Naming authority pointer.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 2915: The Naming Authority Pointer (NAPTR) DNS
+	      Resource Record</h:li>
+	      <h:li>RFC 2168: Resolution of Uniform Resource
+	      Identifiers using the Domain Name System</h:li>
+	      <h:li>RFC 3403: Dynamic Delegation Discovery System
+	      (DDDS) Part Three: The Domain Name System (DNS)
+	      Database</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="KX">
+	<value value="36"/>
+	<description>
+	  <text>
+            <h:p>Key exchanger.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 2230: Key Exchange Delegation Record for the
+	  DNS</text>
+	</reference>
+      </enum>
+      <enum name="CERT">
+	<value value="37"/>
+	<description>
+	  <text>
+            <h:p>Certificate.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 4398: Storing Certificates in the Domain Name
+	  System (DNS)</text>
+	</reference>
+      </enum>
+      <enum name="A6">
+	<value value="38"/>
+	<status value="obsolete"/>
+	<description>
+	  <text>
+            <h:p>IPv6 address (obsolete – use AAAA).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 3226: DNSSEC and IPv6 A6 Aware Server/Resolver
+	      Message Size Requirements</h:li>
+	      <h:li>RFC 2874: DNS Extensions to Support IPv6 Address
+	      Aggregation and Renumbering</h:li>
+	      <h:li>RFC 6563: Moving A6 to Historic Status</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="DNAME">
+	<value value="39"/>
+	<description>
+	  <text>
+            <h:p>DNAME.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 2672: Non-Terminal DNS Name Redirection</h:li>
+	      <h:li>RFC 6672: DNAME Redirection in the DNS</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SINK">
+	<value value="40"/>
+	<description>
+	  <text>
+            <h:p>Kitchen sink.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="OPT">
+	<value value="41"/>
+	<description>
+	  <text>
+            <h:p>OPT pseudo-RR.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 6891: Extension Mechanisms for DNS
+	      (EDNS(0))</h:li>
+	      <h:li>RFC 3225: Indicating Resolver Support of
+	      DNSSEC</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="APL">
+	<value value="42"/>
+	<description>
+	  <text>
+            <h:p>Address prefix list.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 3123: A DNS RR Type for Lists of Address Prefixes
+	  (APL RR)</text>
+	</reference>
+      </enum>
+      <enum name="DS">
+	<value value="43"/>
+	<description>
+	  <text>
+            <h:p>Delegation signer.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3658: Delegation Signer (DS) Resource Record
+	      (RR)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="SSHFP">
+	<value value="44"/>
+	<description>
+	  <text>
+            <h:p>SSH key fingerprint.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 4255: Using DNS to Securely Publish Secure Shell
+	  (SSH) Key Fingerprints</text>
+	</reference>
+      </enum>
+      <enum name="IPSECKEY">
+	<value value="45"/>
+	<description>
+	  <text>
+            <h:p>IPSec key.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 4025: A Method for Storing IPsec Keying Material
+	  in DNS</text>
+	</reference>
+      </enum>
+      <enum name="RRSIG">
+	<value value="46"/>
+	<description>
+	  <text>
+            <h:p>RR signature.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="NSEC">
+	<value value="47"/>
+	<description>
+	  <text>
+            <h:p>NSEC resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="DNSKEY">
+	<value value="48"/>
+	<description>
+	  <text>
+            <h:p>DNSKEY resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 4034: Resource Records for the DNS Security
+	      Extensions</h:li>
+	      <h:li>RFC 3755: Legacy Resolver Compatibility for
+	      Delegation Signer (DS)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="DHCID">
+	<value value="49"/>
+	<description>
+	  <text>
+            <h:p>DHCID resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 4701: A DNS Resource Record (RR) for Encoding
+	  Dynamic Host Configuration Protocol (DHCP) Information
+	  (DHCID RR)</text>
+	</reference>
+      </enum>
+      <enum name="NSEC3">
+	<value value="50"/>
+	<description>
+	  <text>
+            <h:p>NSEC3 resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 5155: DNS Security (DNSSEC) Hashed Authenticated
+	  Denial of Existence</text>
+	</reference>
+      </enum>
+      <enum name="NSEC3PARAM">
+	<value value="51"/>
+	<description>
+	  <text>
+            <h:p>NSEC3PARAM resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 5155: DNS Security (DNSSEC) Hashed Authenticated
+	  Denial of Existence</text>
+	</reference>
+      </enum>
+      <enum name="TLSA">
+	<value value="52"/>
+	<description>
+	  <text>
+            <h:p>TLSA resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 6698: The DNS-Based Authentication of Named
+	  Entities (DANE) Transport Layer Security (TLS) Protocol:
+	  TLSA</text>
+	</reference>
+      </enum>
+      <enum name="SMIMEA">
+	<value value="53"/>
+	<description>
+	  <text>S/MIME cert association</text>
+	</description>
+	<reference>
+	  <text>RFC 8162: Using Secure DNS to Associate Certificates
+	  with Domain Names for S/MIME</text>
+	</reference>
+      </enum>
+      <enum name="HIP">
+	<value value="55"/>
+	<description>
+	  <text>
+            <h:p>Host identity protocol.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 5205: Host Identity Protocol (HIP) Domain Name
+	  System (DNS) Extension</text>
+	</reference>
+      </enum>
+      <enum name="NINFO">
+	<value value="56"/>
+	<description>
+	  <text>
+            <h:p>NINFO resource record.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="RKEY">
+	<value value="57"/>
+	<description>
+	  <text>
+            <h:p>RKEY resource record.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="TALINK">
+	<value value="58"/>
+	<description>
+	  <text>
+            <h:p>Trust anchor LINK.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="CDS">
+	<value value="59"/>
+	<description>
+	  <text>
+            <h:p>Child DS.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7344: Automating DNSSEC Delegation Trust
+	  Maintenance</text>
+	</reference>
+      </enum>
+      <enum name="CDNSKEY">
+	<value value="60"/>
+	<description>
+	  <text>
+            <h:p>DNSKEY(s) the child wants reflected in DS.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7344: Automating DNSSEC Delegation Trust
+	  Maintenance</text>
+	</reference>
+      </enum>
+      <enum name="OPENPGPKEY">
+	<value value="61"/>
+	<description>
+	  <text>
+            <h:p>OpenPGP key.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7929: DNS-Based Authentication of Named Entities
+	  (DANE) Bindings for OpenPGP</text>
+	</reference>
+      </enum>
+      <enum name="CSYNC">
+	<value value="62"/>
+	<description>
+	  <text>
+            <h:p>Child-to-parent synchronization.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7477: Child-to-Parent Synchronization in
+	  DNS</text>
+	</reference>
+      </enum>
+      <enum name="SPF">
+	<value value="99"/>
+	<description>
+	  <text>SPF (sender policy framework) resource record.</text>
+	</description>
+	<reference>
+	  <text>RFC 7208: Sender Policy Framework (SPF) for
+	  Authorizing Use of Domains in Email, Version 1</text>
+	</reference>
+      </enum>
+      <enum name="UINFO">
+	<value value="100"/>
+	<description>
+	  <text>IANA-reserved.</text>
+	</description>
+      </enum>
+      <enum name="UID">
+	<value value="101"/>
+	<description>
+	  <text>IANA-reserved.</text>
+	</description>
+      </enum>
+      <enum name="GID">
+	<value value="102"/>
+	<description>
+	  <text>IANA-reserved.</text>
+	</description>
+      </enum>
+      <enum name="UNSPEC">
+	<value value="103"/>
+	<description>
+	  <text>IANA-reserved.</text>
+	</description>
+      </enum>
+      <enum name="NID">
+	<value value="104"/>
+	<description>
+	  <text>Node identifier.</text>
+	</description>
+	<reference>
+	  <text>RFC 6742: DNS Resource Records for the
+	  Identifier-Locator Network Protocol (ILNP)</text>
+	</reference>
+      </enum>
+      <enum name="L32">
+	<value value="105"/>
+	<description>
+	  <text>L32 resource record.</text>
+	</description>
+	<reference>
+	  <text>RFC 6742: DNS Resource Records for the
+	  Identifier-Locator Network Protocol (ILNP)</text>
+	</reference>
+      </enum>
+      <enum name="L64">
+	<value value="106"/>
+	<description>
+	  <text>L64 resource record.</text>
+	</description>
+	<reference>
+	  <text>RFC 6742: DNS Resource Records for the
+	  Identifier-Locator Network Protocol (ILNP)</text>
+	</reference>
+      </enum>
+      <enum name="LP">
+	<value value="107"/>
+	<description>
+	  <text>LP resource record.</text>
+	</description>
+	<reference>
+	  <text>RFC 6742: DNS Resource Records for the
+	  Identifier-Locator Network Protocol (ILNP)</text>
+	</reference>
+      </enum>
+      <enum name="EUI48">
+	<value value="108"/>
+	<description>
+	  <text>
+            <h:p>An EUI-48 address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7043: Resource Records for EUI-48 and EUI-64
+	  Addresses in the DNS</text>
+	</reference>
+      </enum>
+      <enum name="EUI64">
+	<value value="109"/>
+	<description>
+	  <text>
+            <h:p>An EUI-64 address.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7043: Resource Records for EUI-48 and EUI-64
+	  Addresses in the DNS</text>
+	</reference>
+      </enum>
+      <enum name="TKEY">
+	<value value="249"/>
+	<description>
+	  <text>
+            <h:p>Transaction key.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 2930: Secret Key Establishment for DNS (TKEY
+	  RR)</text>
+	</reference>
+      </enum>
+      <enum name="TSIG">
+	<value value="250"/>
+	<description>
+	  <text>
+            <h:p>Transaction signature.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 2845: Secret Key Transaction Authentication for
+	  DNS (TSIG)</text>
+	</reference>
+      </enum>
+      <enum name="IXFR">
+	<value value="251"/>
+	<description>
+	  <text>
+            <h:p>Incremental transfer.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1995: Incremental Zone Transfer in DNS</text>
+	</reference>
+      </enum>
+      <enum name="AXFR">
+	<value value="252"/>
+	<description>
+	  <text>
+            <h:p>Transfer of an entire zone.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 1035: Domain Names - Implementation and
+	      Specification</h:li>
+	      <h:li>RFC 5936: DNS Zone Transfer Protocol (AXFR)</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="MAILB">
+	<value value="253"/>
+	<description>
+	  <text>
+            <h:p>Mailbox-related RRs (MB, MG or MR).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="MAILA">
+	<value value="254"/>
+	<status value="obsolete"/>
+	<description>
+	  <text>
+            <h:p>Mail agent RRs (obsolete – see MX).</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 1035: Domain Names - Implementation and
+	  Specification</text>
+	</reference>
+      </enum>
+      <enum name="*">
+	<value value="255"/>
+	<description>
+	  <text>
+            <h:p>A request for all records the server/cache has
+            available.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>
+	    <h:ul>
+	      <h:li>RFC 1035: Domain Names - Implementation and
+	      Specification</h:li>
+	      <h:li>RFC 6895: Domain Name System (DNS) IANA
+	      Considerations</h:li>
+	    </h:ul>
+	  </text>
+	</reference>
+      </enum>
+      <enum name="URI">
+	<value value="256"/>
+	<description>
+	  <text>
+            <h:p>URI resource record.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 7553: The Uniform Resource Identifier (URI) DNS
+	  Resource Record</text>
+	</reference>
+      </enum>
+      <enum name="CAA">
+	<value value="257"/>
+	<description>
+	  <text>
+            <h:p>Certification authority authorization.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 6844: DNS Certification Authority Authorization
+	  (CAA) Resource Record</text>
+	</reference>
+      </enum>
+      <enum name="AVC">
+	<value value="258"/>
+	<description>
+	  <text>Application visibility and control.</text>
+	</description>
+      </enum>
+      <enum name="DOA">
+	<value value="259"/>
+	<description>
+	  <text>Digital object architecture</text>
+	</description>
+	<reference>
+	  <text>draft-durand-doa-over-dns: DOA over DNS</text>
+	</reference>
+      </enum>
+      <enum name="TA">
+	<value value="32768"/>
+	<description>
+	  <text>
+            <h:p>DNSSEC trust authorities.</h:p>
+	  </text>
+	</description>
+      </enum>
+      <enum name="DLV">
+	<value value="32769"/>
+	<description>
+	  <text>
+            <h:p>DNSSEC lookaside validation.</h:p>
+	  </text>
+	</description>
+	<reference>
+	  <text>RFC 4431: The DNSSEC Lookaside Validation (DLV) DNS
+	  Resource Record</text>
+	</reference>
+      </enum>
+    </type>
+  </typedef>
+
+  <typedef name="rr-type">
+    <description>
+      <text>This type allows for referring to a DNS resource record
+      type using either the assigned mnemonic name or numeric
+      value.</text>
+    </description>
+    <type name="union">
+      <type name="uint16"/>
+      <type name="rr-type-name"/>
+    </type>
+  </typedef>
+
+</module>

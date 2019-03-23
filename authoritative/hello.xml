@@ -1,0 +1,16 @@
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+    <capability>http://www.nic.cz/ns/yang/dnssec-signing?module=cznic-dnssec-signing&amp;revision=2019-03-20&amp;features=</capability>
+    <capability>http://www.nic.cz/ns/yang/dns-server?module=cznic-dns-server&amp;revision=2019-03-21&amp;features=acl-entry-port,any-to-tcp,journal-from-differences</capability>
+    <capability>http://www.nic.cz/ns/yang/knot-dns?module=cznic-knot-dns&amp;revision=2019-03-20&amp;features=</capability>
+    <capability>http://www.nic.cz/ns/yang/dns-opcode-rcode?module=cznic-dns-opcode-rcode&amp;revision=2019-03-18&amp;features=</capability>
+    <capability>http://www.nic.cz/ns/yang/dns-parameters?module=cznic-dns-parameters&amp;revision=2019-03-20&amp;features=</capability>
+    <capability>http://www.nic.cz/ns/yang/tsig-algorithms?module=cznic-tsig-algorithms&amp;revision=2019-03-20&amp;features=</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-dns-class-rr-type?module=iana-dns-class-rr-type&amp;revision=2019-02-27&amp;features=</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15&amp;features=</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-acm?module=ietf-netconf-acm&amp;revision=2018-02-14&amp;features=</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2013-07-15&amp;features=</capability>
+  </capabilities>
+</hello>

@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module name="cznic-dns-rdata"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:dnszc="http://www.nic.cz/ns/yang/dns-rdata"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+  <namespace uri="http://www.nic.cz/ns/yang/dns-rdata"/>
+  <prefix value="rdata"/>
+  <yang-version value="1.1"/>
+
+  <!-- Imports -->
+
+  <import module="ietf-inet-types">
+    <prefix value="inet"/>
+  </import>
+  <import module="ietf-yang-types">
+    <prefix value="yang"/>
+  </import>
+  <import module="iana-dns-class-rr-type">
+    <prefix value="dnsct"/>
+  </import>
+  <import module="cznic-dns-parameters">
+    <prefix value="dnspar"/>
+  </import>
+
+  <!-- Metadata -->
+
+  <organization>
+    <text>CZ.NIC, z. s. p. o.</text>
+  </organization>
+  <contact>
+    <text>
+      <h:p>
+        Editor:   Ladislav Lhotka<h:br/>
+                  &lt;mailto:lhotka@nic.cz&gt;
+      </h:p>
+    </text>
+  </contact>
+  <description>
+    <text>
+      <h:p>This module contains typedefs and groupings that define the
+      RDATA contents for all DNS resource record types.</h:p>
+    </text>
+  </description>
+  <reference>
+    <text>
+      RFC 1035: Domain Names - Implementation and Specification.
+    </text>
+  </reference>
+  <revision date="2019-03-20">
+    <description>
+      <text>Initial revision.</text>
+    </description>
+  </revision>
+
+  <!-- Groupings -->
+
+  <grouping name="rrsig">
+    <description>
+      <text>
+	RDATA for 'RRSIG' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security
+	Extensions
+      </text>
+    </reference>
+    <leaf name="algorithm">
+      <type name="dnspar:dnssec-algorithm"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field identifies the cryptographic algorithm
+	  used to create the signature.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="signature-expiration">
+      <type name="dnspar:utc-date-time"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies the end of a validity period
+	  for the signature as UTC date and time. The RRSIG
+	  record MUST NOT be used for authentication after
+	  the expiration date and time.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="signature-inception">
+      <type name="dnspar:utc-date-time"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  <h:p>This field specifies the start of a validity
+	  period for the signature as UTC date and time. The
+	  RRSIG record MUST NOT be used for authentication
+	  prior the inception date and time.</h:p>
+	  <h:p>This date MUST precede the date specified in
+	  'signature-expiration'.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <uses name="key-tag-field"/>
+    <leaf name="signature">
+      <type name="binary">
+	<length value="1..max"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  <h:p>This field contains the cryptographic
+	  signature that covers the RRSIG RDATA (excluding
+	  the Signature field) and the RRset specified by
+	  the RRSIG owner name, RRSIG class, and RRSIG Type
+	  Covered field.</h:p>
+	  <h:p>The format of this field depends on the algorithm in
+	  use.</h:p>
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="key-tag-field">
+    <description>
+      <text>
+	This grouping defines the 'key-tag' field that is used in
+	RRSIG and DS resource records.
+      </text>
+    </description>
+    <leaf name="key-tag">
+      <type name="uint16"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  The Key Tag field contains the key tag value of the DNSKEY
+	  RR that validates this signature, in network byte order.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="rrset-types">
+    <description>
+      <text>
+	This grouping defines a sequence of RR types, It is used in
+	NSEC and NSEC3 resource records.
+      </text>
+    </description>
+    <leaf-list name="rrset-type">
+      <type name="dnsct:rr-type"/>
+      <min-elements value="1"/>
+      <description>
+	<text>
+	  This leaf-list represents the Type Bit Maps field. Its
+	  entries identify the RRset types that exist at the NSEC RR's
+	  owner name.
+	</text>
+      </description>
+    </leaf-list>
+  </grouping>
+
+  <grouping name="nsec3-common">
+    <description>
+      <text>
+	This grouping defines common field of NSEC3 and NSEC3PARAM
+	resource records.
+      </text>
+    </description>
+    <leaf name="hash-algorithm">
+      <type name="dnspar:dnssec-nsec3-hash-algorithm"/>
+      <default value="SHA-1"/>
+      <description>
+	<text>
+	  This field identifies the cryptographic hash algorithm used
+	  to construct the hash-value.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="iterations">
+      <type name="uint16"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field defines the number of additional times the hash
+	  function has been performed.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="salt">
+      <type name="dnspar:hex-digits">
+	<length value="0..510"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field is appended to the original owner name before
+	  hashing in order to defend against pre-calculated dictionary
+	  attacks.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="soa">
+    <description>
+      <text>
+	RDATA content for 'SOA' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="mname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Name server that was the original or primary source of
+	  data for this zone.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="rname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Mailbox of the person responsible for this zone.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="serial">
+      <type name="yang:counter32"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Version number of the original copy of the zone.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="refresh">
+      <type name="dnspar:time-interval"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Time interval that should elapse before the zone should
+	  be refreshed.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="retry">
+      <type name="dnspar:time-interval"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Time interval that should elapse before a failed refresh
+	  should be retried.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="expire">
+      <type name="dnspar:time-interval"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Upper limit on the time interval that can elapse before
+	  the zone is no longer authoritative.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="minimum">
+      <type name="dnspar:time-interval"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Minimum TTL that should be exported with any RR from
+	  this zone.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="a">
+    <description>
+      <text>
+	RDATA content for 'A' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="address">
+      <type name="inet:ipv4-address-no-zone"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  IPv4 address.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="cname">
+    <description>
+      <text>
+	RDATA content for 'CNAME' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="cname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Canonical or primary name for the owner.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="hinfo">
+    <description>
+      <text>
+	RDATA content for 'HINFO' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="cpu">
+      <type name="dnspar:ascii-string"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  CPU type.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="os">
+      <type name="dnspar:ascii-string"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Operating system type.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="mb">
+    <description>
+      <text>
+	RDATA content for 'MB' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="madname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Host which has the specified mailbox.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="md">
+    <status value="obsolete"/>
+    <description>
+      <text>
+	RDATA content for 'MD' Resource Record (obsolete,
+	use MX).
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="madname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Host which has a mail agent for the domain which
+	  should be able to deliver mail for the domain.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="mf">
+    <status value="obsolete"/>
+    <description>
+      <text>
+	RDATA content for 'MF' Resource Record (obsolete,
+	use MX).
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="madname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Host which has a mail agent for the domain which
+	  will accept mail for forwarding to the domain.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="mg">
+    <description>
+      <text>
+	RDATA content for 'MG' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="mgmname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Mailbox which is a member of the mail group
+	  specified by the domain name.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="minfo">
+    <description>
+      <text>
+	RDATA content for 'MINFO' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="rmailbx">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Mailbox which is responsible for the mailing list
+	  or mailbox.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="emailbx">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Mailbox which is to receive error messages related
+	  to the mailing list or mailbox specified by the
+	  owner of the MINFO RR.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="mr">
+    <description>
+      <text>
+	RDATA content for 'MR' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="newname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Mailbox which is the proper rename of the
+	  specified mailbox.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="mx">
+    <description>
+      <text>
+	RDATA content for 'MX' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="preference">
+      <type name="uint16"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Preference given to this RR among others at the
+	  same owner. Lower values are preferred.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="exchange">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Host willing to act as a mail exchange for the
+	  owner name.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="ns">
+    <description>
+      <text>
+	RDATA content for 'NS' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="nsdname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Host which should be authoritative for the
+	  specified domain.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="null">
+    <description>
+      <text>
+	RDATA content for 'NULL' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="data">
+      <type name="binary">
+	<length value="0..65535"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Arbitrary data.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="ptr">
+    <description>
+      <text>
+	RDATA content for 'PTR' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="ptrdname">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  A pointer to some location in the domain name
+	  space.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="txt">
+    <description>
+      <text>
+	RDATA content for 'TXT' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="txt-data">
+      <type name="dnspar:ascii-string"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Descriptive text whose semantics depends on the
+	  domain where it is found.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="wks">
+    <description>
+      <text>
+	RDATA content for 'WKS' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 1035: Domain Names - Implementation and
+	Specification.
+      </text>
+    </reference>
+    <leaf name="address">
+      <type name="inet:ipv4-address-no-zone"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  IPv4 address.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="protocol">
+      <type name="uint8"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  IP protocol number.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="bitmap">
+      <type name="binary"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  A variable length bitmap that has one bit per port
+	  of the specified protocol.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="aaaa">
+    <description>
+      <text>
+	RDATA content for 'AAAA' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 3596: DNS Extensions to Support IP Version 6
+      </text>
+    </reference>
+    <leaf name="address">
+      <type name="inet:ipv6-address-no-zone"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  IPv6 address.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="dnskey">
+    <description>
+      <text>
+	RDATA content for 'DNSKEY' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security
+	Extensions
+      </text>
+    </reference>
+    <leaf name="flags">
+      <type name="dnspar:dnskey-flags"/>
+      <must condition="contains(., 'ZONE') or not(contains(., 'SEP'))">
+	<description>
+	  <text>
+	    Secure Entry Point flag needs Zone Key flag.
+	  </text>
+	</description>
+	<error-message>
+	  <value>
+	    'secure-entry-point' is set but 'zone-key' isn't
+	  </value>
+	</error-message>
+      </must>
+      <description>
+	<text>DNSKEY RR flags.</text>
+      </description>
+    </leaf>
+    <leaf name="protocol">
+      <type name="uint8">
+	<range value="3"/>
+      </type>
+      <default value="3"/>
+      <description>
+	<text>
+	  Protocol field. It's value MUST be 3.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="algorithm">
+      <type name="dnspar:dnssec-algorithm"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field identifies the public key's
+	  cryptographic algorithm and determines the format
+	  of the 'public-key' field.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="public-key">
+      <type name="binary">
+	<length value="1..max"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains public key material. Its
+	  format depends on the algorithm.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="nsec">
+    <description>
+      <text>
+	RDATA content for 'NSEC' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security
+	Extensions
+      </text>
+    </reference>
+    <leaf name="next-domain-name">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains the next owner name (in the
+	  canonical ordering of the zone) that has
+	  authoritative data or contains a delegation point
+	  NS RRset.
+	</text>
+      </description>
+    </leaf>
+    <uses name="rrset-types"/>
+  </grouping>
+
+  <grouping name="ds">
+    <description>
+      <text>
+	RDATA content for 'DS' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4034: Resource Records for the DNS Security
+	Extensions
+      </text>
+    </reference>
+    <uses name="key-tag-field"/>
+    <leaf name="algorithm">
+      <type name="dnspar:dnssec-algorithm"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies the algorithm of the DNSKEY
+	  RR referred to by the DS record.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="digest-type">
+      <type name="dnspar:digest-algorithm"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field identifies the algorithm used to
+	  construct the digest of the DNSKEY RR.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="digest">
+      <type name="dnspar:hex-digits">
+	<length value="1..max"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains a digest of the DNSKEY RR to
+	  which the DS RR refers.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="nsec3">
+    <description>
+      <text>
+	RDATA content for 'NSEC3' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 5155: DNS Security (DNSSEC) Hashed Authenticated
+	Denial of Existence
+      </text>
+    </reference>
+    <uses name="nsec3-common"/>
+    <leaf name="flags">
+      <type name="dnspar:dnssec-nsec3-flags"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains flags that indicate different
+	  processing of the NSEC3 RR data.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="next-hashed-owner-name">
+      <type name="dnspar:base32hex">
+	<length value="8..408"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains the next hashed owner name in
+	  hash order.
+	</text>
+      </description>
+    </leaf>
+    <uses name="rrset-types"/>
+  </grouping>
+
+  <grouping name="nsec3param">
+    <description>
+      <text>
+	RDATA content for 'NSEC3PARAM' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 5155: DNS Security (DNSSEC) Hashed Authenticated
+	Denial of Existence
+      </text>
+    </reference>
+    <uses name="nsec3-common"/>
+  </grouping>
+
+  <grouping name="tlsa">
+    <description>
+      <text>
+	RDATA content for 'TLSA' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 6698: The DNS-Based Authentication of Named
+	Entities (DANE) Transport Layer Security (TLS)
+	Protocol: TLSA
+      </text>
+    </reference>
+    <leaf name="certificate-usage">
+      <type name="dnspar:tlsa-certificate-usages"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies the provided association that
+	  will be used to match the certificate presented in
+	  the TLS handshake.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="selector">
+      <type name="dnspar:tlsa-selectors"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies which part of the TLS
+	  certificate presented by the server will be
+	  matched against the association data.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="matching-type">
+      <type name="dnspar:tlsa-matching-type"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies how the certificate
+	  association is presented.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="certificate-association-data">
+      <type name="dnspar:hex-digits">
+	<length value="1..max"/>
+      </type>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  <h:p>This field specifies the "certificate association
+	  data" to be matched.</h:p>
+	  <h:p>These bytes are either raw data (that is, the
+	  full certificate or its SubjectPublicKeyInfo,
+	  depending on 'selector') for 'matching-type' 0, or
+	  the hash of the raw data for 'matching-type' 1 and
+	  2.</h:p>
+	  <h:p>The data refers to the certificate in the
+	  association, not to the TLS ASN.1 Certificate
+	  object.</h:p>
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="ipseckey">
+    <description>
+      <text>
+	RDATA content for 'IPSECKEY' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4025: A Method for Storing IPsec Keying Material
+	in DNS
+      </text>
+    </reference>
+    <leaf name="precedence">
+      <type name="uint8"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  <h:p>Precedence of the resource record.</h:p>
+	  <h:p>Gateways listed in IPSECKEY records with
+	  lower precedence are to be attempted first.  Where
+	  there is a tie in precedence, the order should be
+	  non-deterministic.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <leaf name="gateway-type">
+      <type name="dnspar:ipseckey-gateway-type"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field indicates the format of the information
+	  that is stored in the gateway field.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="algorithm">
+      <type name="dnspar:ipseckey-algorithm-type"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field identifies the public key's
+	  cryptographic algorithm and determines the format
+	  of the 'public-key' field.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="gateway">
+      <when condition="../gateway-type != 'no-gateway'">
+	<description>
+	  <text>
+	    This field cannot be present if the value of
+	    'gateway-type' is 'no-gateway'.
+	  </text>
+	</description>
+      </when>
+      <type name="inet:host"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  <h:p>This field indicates a gateway to which an IPsec
+	  tunnel may be created in order to reach the entity
+	  named by this resource record.</h:p>
+	  <h:p>The format of this field MUST correspond to
+	  the value set in 'gateway-type'.</h:p>
+	</text>
+      </description>
+    </leaf>
+    <leaf name="public-key">
+      <when condition="../algorithm != 'no-key'">
+	<description>
+	  <text>
+	    This field cannot be present if the value of
+	    'algorithm' is 'no-key'.
+	  </text>
+	</description>
+      </when>
+      <type name="binary"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field contains the IPSec public key in a
+	  format corresponding to the value of 'algorithm'.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="dname">
+    <description>
+      <text>
+	RDATA content for 'DNAME' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 2672: Non-Terminal DNS Name Redirection
+      </text>
+    </reference>
+    <leaf name="target">
+      <type name="inet:domain-name"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Target domain name that is substituted for 'owner'
+	  as a suffix of a domain name.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+  <grouping name="sshfp">
+    <description>
+      <text>
+	RDATA content for 'SSHFP' Resource Record.
+      </text>
+    </description>
+    <reference>
+      <text>
+	RFC 4255: Using DNS to Securely Publish Secure Shell
+	(SSH) Key Fingerprints
+      </text>
+    </reference>
+    <leaf name="algorithm">
+      <type name="dnspar:sshfp-algorithm-type"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies the algorithm of the public
+	  key.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="fingerprint-type">
+      <type name="dnspar:sshfp-fingerprint-type"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  This field specifies the message-digest algorithm
+	  used to calculate teh fingerprint of the public
+	  key.
+	</text>
+      </description>
+    </leaf>
+    <leaf name="fingerprint">
+      <type name="dnspar:hex-digits"/>
+      <mandatory value="true"/>
+      <description>
+	<text>
+	  Fingerprint of the public key.
+	</text>
+      </description>
+    </leaf>
+  </grouping>
+
+</module>
