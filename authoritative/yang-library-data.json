@@ -3,12 +3,6 @@
     "module-set-id": "XXXX",
     "module": [
       {
-        "name": "cznic-dnssec-signing",
-        "revision": "2019-03-20",
-        "namespace": "http://www.nic.cz/ns/yang/dnssec-signing",
-        "conformance-type": "implement"
-      },
-      {
         "name": "cznic-dns-server",
         "revision": "2019-03-21",
         "feature": [
@@ -17,12 +11,6 @@
           "journal-from-differences"
         ],
         "namespace": "http://www.nic.cz/ns/yang/dns-server",
-        "conformance-type": "implement"
-      },
-      {
-        "name": "cznic-knot-dns",
-        "revision": "2019-03-20",
-        "namespace": "http://www.nic.cz/ns/yang/knot-dns",
         "conformance-type": "implement"
       },
       {
@@ -54,12 +42,6 @@
         "revision": "2013-07-15",
         "namespace": "urn:ietf:params:xml:ns:yang:ietf-inet-types",
         "conformance-type": "import"
-      },
-      {
-        "name": "ietf-netconf-acm",
-        "revision": "2018-02-14",
-        "namespace": "urn:ietf:params:xml:ns:yang:ietf-netconf-acm",
-        "conformance-type": "implement"
       },
       {
         "name": "ietf-yang-types",
