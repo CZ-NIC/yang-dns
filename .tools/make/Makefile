@@ -13,7 +13,7 @@ all: $(yams)
 	@xsltproc --xinclude $(xsldir)/canonicalize.xsl $< | \
 	xsltproc --output $@ $(xslpars) $(xsldir)/yin2yang.xsl -
 
-model.tree: $(yams)
+model.tree: $(yams) $(yl)
 	yangson -t -p $(modpath) $(yl) > $@
 
 clean:
