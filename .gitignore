@@ -2,3 +2,4 @@
 *.yang
 !ietf/*.yang
 model.tree
+example.json

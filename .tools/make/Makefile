@@ -1,4 +1,5 @@
 SOURCES = $(wildcard *.yinx)
+EXAMPLE = example-data
 yams = $(SOURCES:.yinx=.yang)
 yl = yang-library-data.json
 modpath = .:../common:../ietf
@@ -16,5 +17,11 @@ all: $(yams)
 model.tree: $(yams) $(yl)
 	yangson -t -p $(modpath) $(yl) > $@
 
+$(EXAMPLE).json: $(EXAMPLE).xml
+	xsltproc -o $@ model.xsl $<
+
+validate: $(EXAMPLE).json $(yams)
+	yangson -v $< $(yl)
+
 clean:
-	@rm -rf $(yams) model.tree
+	@rm -rf $(yams) model.tree $(EXAMPLE).json

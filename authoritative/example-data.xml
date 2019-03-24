@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <dns-server xmlns="http://www.nic.cz/ns/yang/dns-slave-server">
+    <description>
+      Simple configuration of a slave server.
+    </description>
+    <remote-server>
+      <name>icann-axfr</name>
+      <description>
+	ICANN-provided source for the root zone. 
+      </description>
+      <remote>
+        <ip-address>2620:0:2d0:202::132</ip-address>
+      </remote>
+    </remote-server>
+    <remote-server>
+      <name>exrec</name>
+      <description>
+	Example recipient of notifications.
+      </description>
+      <remote>
+	<ip-address>198.51.100.1</ip-address>
+	<port>6378</port>
+      </remote>
+    </remote-server>
+    <zones>
+      <zone>
+        <domain>.</domain>
+        <description>root zone</description>
+        <master>icann-axfr</master>
+        <notify>
+          <recipient>exrec</recipient>
+        </notify>
+      </zone>
+    </zones>
+  </dns-server>
+</data>
