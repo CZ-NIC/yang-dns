@@ -3,50 +3,15 @@
     "module-set-id": "XXXX",
     "module": [
       {
-        "name": "cznic-dns-server",
-        "revision": "2019-03-21",
-        "feature": [
-          "acl-entry-port",
-          "any-to-tcp",
-          "journal-from-differences"
-        ],
-        "namespace": "http://www.nic.cz/ns/yang/dns-server",
+        "name": "cznic-dns-slave-server",
+        "revision": "2019-03-24",
+        "namespace": "http://www.nic.cz/ns/yang/dns-slave-server",
         "conformance-type": "implement"
-      },
-      {
-        "name": "cznic-dns-opcode-rcode",
-        "revision": "2019-03-18",
-        "namespace": "http://www.nic.cz/ns/yang/dns-opcode-rcode",
-        "conformance-type": "import"
-      },
-      {
-        "name": "cznic-dns-parameters",
-        "revision": "2019-03-20",
-        "namespace": "http://www.nic.cz/ns/yang/dns-parameters",
-        "conformance-type": "import"
-      },
-      {
-        "name": "cznic-tsig-algorithms",
-        "revision": "2019-03-20",
-        "namespace": "http://www.nic.cz/ns/yang/tsig-algorithms",
-        "conformance-type": "implement"
-      },
-      {
-        "name": "iana-dns-class-rr-type",
-        "revision": "2019-02-27",
-        "namespace": "urn:ietf:params:xml:ns:yang:iana-dns-class-rr-type",
-        "conformance-type": "import"
       },
       {
         "name": "ietf-inet-types",
         "revision": "2013-07-15",
         "namespace": "urn:ietf:params:xml:ns:yang:ietf-inet-types",
-        "conformance-type": "import"
-      },
-      {
-        "name": "ietf-yang-types",
-        "revision": "2013-07-15",
-        "namespace": "urn:ietf:params:xml:ns:yang:ietf-yang-types",
         "conformance-type": "import"
       }
     ]

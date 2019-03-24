@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module name="cznic-dns-slave-server"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:dnsss="http://www.nic.cz/ns/yang/dns-slave-server"
+	xmlns:h="http://www.w3.org/1999/xhtml">
+  <namespace uri="http://www.nic.cz/ns/yang/dns-slave-server"/>
+  <prefix value="dnsss"/>
+  <yang-version value="1.1"/>
+  <import module="ietf-inet-types">
+    <prefix value="inet"/>
+  </import>
+  <organization>
+    <text>CZ.NIC, z. s. p. o.</text>
+  </organization>
+  <contact>
+    <text>
+      <h:p>
+        Editor:   Ladislav Lhotka<h:br/>
+                  &lt;mailto:lhotka@nic.cz&gt;
+      </h:p>
+    </text>
+  </contact>
+  <description>
+    <text>
+      <h:p>This YANG module defines the minimum data model for an
+      authoritative *slave* DNS server.</h:p>
+      <h:p>It is primarily intended for demonstrating simultaneous
+      configuration of multiple slave servers (different
+      implementations).</h:p>
+    </text>
+  </description>
+
+  <revision date="2019-03-24">
+    <description>
+      <text>Initial revision.</text>
+    </description>
+  </revision>
+
+  <!-- Features -->
+
+  <!-- Identities -->
+
+  <!-- Typedefs -->
+
+  <typedef name="server-role">
+    <description>
+      <text>Enumeration of roles that the DNS server can play for a
+      given zone.</text>
+    </description>
+    <type name="enumeration">
+      <enum name="master">
+        <description>
+          <text>Master for the zone.</text>
+        </description>
+      </enum>
+      <enum name="slave">
+        <description>
+          <text>Slave for the zone.</text>
+        </description>
+      </enum>
+    </type>
+    <default value="master"/>
+  </typedef>
+
+  <typedef name="remote-ref">
+    <description>
+      <text>
+	This type is used for referring to a configured remote server.
+      </text>
+    </description>
+    <type name="leafref">
+      <path value="/dns-server/remote-server/name"/>
+    </type>
+  </typedef>
+
+  <typedef name="zone-ref">
+    <description>
+      <text>
+	This type is used for referring to a configured zone.
+      </text>
+    </description>
+    <type name="leafref">
+      <path value="/dns-server/zones/zone/domain"/>
+    </type>
+  </typedef>
+
+  <!-- Groupings -->
+
+  <grouping name="endpoint-address">
+    <description>
+      <text>This grouping defines a TCP/IP endpoint address, i.e., the
+      combination of an IP address and port number.</text>
+    </description>
+    <leaf name="ip-address">
+      <type name="inet:ip-address"/>
+      <mandatory value="true"/>
+      <description>
+	<text>IPv4/IPv6 address.</text>
+      </description>
+    </leaf>
+    <leaf name="port">
+      <type name="inet:port-number"/>
+      <description>
+	<text>Port number.</text>
+      </description>
+    </leaf>
+  </grouping>
+  
+  <grouping name="entry-name">
+    <description>
+      <text>
+	This grouping defines a leaf that is intended for use as a
+	list key.
+      </text>
+    </description>
+    <leaf name="name">
+      <description>
+	<text>
+	  Name of a list entry.
+	</text>
+      </description>
+      <type name="string"/>
+    </leaf>
+  </grouping>
+
+  <grouping name="description">
+    <description>
+      <text>This grouping defines 'description' leaf that can be added
+      to various objects.</text>
+    </description>
+    <leaf name="description">
+      <description>
+	<text>Textual description of an object.</text>
+      </description>
+      <type name="string"/>
+    </leaf>
+  </grouping>
+
+  <!-- Configuration data -->
+  
+  <container name="dns-server">
+    <description>
+      <text>
+	Configuration of a DNS server.
+      </text>
+    </description>
+    <uses name="description"/>
+    <list name="remote-server">
+      <description>
+	<text>Definitions of remote servers.</text>
+      </description>
+      <key value="name"/>
+      <uses name="entry-name"/>
+      <uses name="description"/>
+      <container name="remote">
+	<description>
+	  <text>
+	    Parameters of the remote server.
+	  </text>
+	</description>
+	<uses name="endpoint-address">
+	  <refine target-node="port">
+	    <default value="53"/>
+	  </refine>
+	</uses>
+      </container>
+    </list>
+    <container name="zones">
+      <description>
+	<text>Configuration of zones.</text>
+      </description>
+      <grouping name="zone-options">
+	<description>
+	  <text>
+	    This grouping defines zone options that are used both in
+	    the configuration of zones and templates.
+	  </text>
+	</description>
+	<uses name="description"/>
+	<leaf name="role">
+	  <description>
+	    <text>Server role for the zone.</text>
+	  </description>
+	  <type name="server-role"/>
+	  <must condition=". = 'slave'"/>
+	</leaf>
+	<leaf-list name="master">
+	  <type name="remote-ref"/>
+	  <description>
+	    <text>
+	      List of references to master servers for the zone from
+	      which the local server receives zone data via AXFR/IXFR.
+	    </text>
+	  </description>
+	</leaf-list>
+	<container name="notify">
+	  <description>
+	    <text>Configuration of NOTIFY messages.</text>
+	  </description>
+	  <reference>
+	    <text>
+	      RFC 1996: A Mechanism for Prompt Notification of Zone
+	      Changes (DNS NOTIFY).
+	    </text>
+	  </reference>
+	  <leaf-list name="recipient">
+	    <type name="remote-ref"/>
+	    <description>
+	      <text>
+		List of references to NOTIFY recipients.
+	      </text>
+	    </description>
+	  </leaf-list>
+	</container>
+      </grouping>
+      <list name="zone">
+	<description>
+	  <text>List of zones.</text>
+	</description>
+	<key value="domain"/>
+	<leaf name="domain">
+	  <type name="inet:domain-name"/>
+	  <description>
+	    <text>Zone name.</text>
+	  </description>
+	</leaf>
+	<uses name="zone-options"/>
+      </list>
+    </container>
+  </container>
+
+  <!-- Operations -->
+
+  <rpc name="start-server">
+    <description>
+      <text>
+	Start the DNS server, or do nothing if it is already running.
+      </text>
+    </description>
+  </rpc>
+
+  <rpc name="stop-server">
+    <description>
+      <text>
+	Stop the DNS server, or do nothing if it is not running.
+      </text>
+    </description>
+  </rpc>
+
+  <rpc name="restart-server">
+    <description>
+      <text>
+	Restart the DNS server, which is equivalent to executing
+	'stop-server' and 'start-server' in sequence.
+      </text>
+    </description>
+  </rpc>
+
+  <rpc name="reload-server">
+    <description>
+      <text>
+	Reload server configuration.
+      </text>
+    </description>
+  </rpc>
+
+</module>
